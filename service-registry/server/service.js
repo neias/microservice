@@ -21,46 +21,27 @@ module.exports = (config) => {
     const serviceip = req.connection.remoteAddress.includes('::') ? `[${req.connection.remoteAddress}]` : req.connection.remoteAddress;
 
     const serviceKey = serviceRegistry.register(servicename, serviceversion, serviceip, serviceport);
-    return res.json({ result: serviceKey });
+
+    return res.json({result: serviceKey});
   });
 
-  service.delete('/register/:servicename/:serviceversion/:serviceport', (req, res) => {
+  service.delete('/delete/:servicename/:serviceversion/:serviceport', (req, res, next) => {
     const { servicename, serviceversion, serviceport } = req.params;
 
     const serviceip = req.connection.remoteAddress.includes('::') ? `[${req.connection.remoteAddress}]` : req.connection.remoteAddress;
 
     const serviceKey = serviceRegistry.unregister(servicename, serviceversion, serviceip, serviceport);
-    return res.json({ result: serviceKey });
+
+    return res.json({result: serviceKey});
   });
 
-  service.get('/find/:servicename/:serviceversion', (req, res) => {
-    const {servicename, serviceversion } = req.params;
+  service.get('/find/:servicename/:serviceversion', (req, res, next) => {
+    const { servicename, serviceversion } = req.params;
     const svc = serviceRegistry.get(servicename, serviceversion);
-
     if(!svc) return res.status(404).json({ result: 'Service not found' });
-
     return res.json(svc);
   });
 
-  service.get('/list', (req, res, next) => {
-    return next('not implemented');
-  });
-
-  service.get('/list-short', (req, res, next) => {
-    return next('not implemented');
-  });
-
-  service.get('/names', (req, res, next) => {
-    return next('not implemented');
-  });
-
-  service.get('/speaker/:shortname', (req, res, next) => {
-    return next('not implemented');
-  });
-
-  service.get('/artwork/:shortname', (req, res, next) => {
-    return next('not implemented');
-  });
 
   // eslint-disable-next-line no-unused-vars
   service.use((error, req, res, next) => {
