@@ -12,6 +12,8 @@ const circuitBreaker = new CircuitBreaker();
 
 class SpeakersService {
   constructor({ serviceRegisterUrl, serviceVersionIdentifier }) {
+    console.log(serviceRegisterUrl, serviceVersionIdentifier);
+
     this.serviceRegisterUrl = serviceRegisterUrl;
     this.serviceVersionIdentifier = serviceVersionIdentifier;
     this.cache = {};

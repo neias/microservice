@@ -1,20 +1,12 @@
-const path = require('path');
-
 module.exports = {
   development: {
     sitename: 'Roux Meetups [Development]',
     serviceRegisterUrl: 'http://localhost:3000',
-    serviceVersionIdentifier: '1.x.x',
-    data: {
-      feedback: path.join(__dirname, '../data/feedback.json'),
-    },
+    serviceVersionIdentifier: '1.x.x'
   },
   production: {
     sitename: 'Roux Meetups',
     serviceRegisterUrl: 'http://localhost:3000',
     serviceVersionIdentifier: '1.x.x',
-    data: {
-      feedback: path.join(__dirname, '../data/feedback.json'),
-    },
   },
 };

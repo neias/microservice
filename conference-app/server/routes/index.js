@@ -20,6 +20,7 @@ module.exports = (param) => {
 
   router.get('/', async (req, res, next) => {
     try {
+
       const promises = [];
       promises.push(speakers.getListShort());
       promises.push(speakers.getAllArtwork());
