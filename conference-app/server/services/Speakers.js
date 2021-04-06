@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 const axios = require('axios');
 const url = require('url');
 const crypto = require('crypto');
@@ -11,16 +12,14 @@ const CircuitBreaker = require('../lib/CircuitBreaker');
 const circuitBreaker = new CircuitBreaker();
 
 class SpeakersService {
-  constructor({ serviceRegisterUrl, serviceVersionIdentifier }) {
-    console.log(serviceRegisterUrl, serviceVersionIdentifier);
-
-    this.serviceRegisterUrl = serviceRegisterUrl;
+  constructor({ serviceRegistryUrl, serviceVersionIdentifier }) {
+    this.serviceRegistryUrl = serviceRegistryUrl;
     this.serviceVersionIdentifier = serviceVersionIdentifier;
     this.cache = {};
   }
 
-  async getImage(path){
-    const {ip, port} = await this.getService('speakers-service');
+  async getImage(path) {
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       responseType: 'stream',
@@ -29,7 +28,7 @@ class SpeakersService {
   }
 
   async getNames() {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/names`,
@@ -37,16 +36,15 @@ class SpeakersService {
   }
 
   async getListShort() {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/list-short`,
     });
-
   }
 
   async getList() {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/list`,
@@ -54,7 +52,7 @@ class SpeakersService {
   }
 
   async getAllArtwork() {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/artwork`,
@@ -62,7 +60,7 @@ class SpeakersService {
   }
 
   async getSpeaker(shortname) {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/speaker/${shortname}`,
@@ -70,46 +68,44 @@ class SpeakersService {
   }
 
   async getArtworkForSpeaker(shortname) {
-    const {ip, port} = await this.getService('speakers-service');
+    const { ip, port } = await this.getService('speakers-service');
     return this.callService({
       method: 'get',
       url: `http://${ip}:${port}/artwork/${shortname}`,
     });
   }
 
-  async callService(requestOptions){
+  async callService(requestOptions) {
     const servicePath = url.parse(requestOptions.url).path;
     const cacheKey = crypto.createHash('md5').update(requestOptions.method + servicePath).digest('hex');
     let cacheFile = null;
 
-    if(requestOptions.responseType && requestOptions.responseType === 'stream'){
+    if (requestOptions.responseType && requestOptions.responseType === 'stream') {
       cacheFile = `${__dirname}/../../_imagecache/${cacheKey}`;
     }
 
     const result = await circuitBreaker.callService(requestOptions);
 
-    if(!result){
-      if(this.cache[cacheKey]) return this.cache[cacheKey];
-      if(cacheFile){
+    if (!result) {
+      if (this.cache[cacheKey]) return this.cache[cacheKey];
+      if (cacheFile) {
         const exists = await fsexists(cacheFile);
-        if(exists) return fs.createReadStream(cacheFile);
+        if (exists) return fs.createReadStream(cacheFile);
       }
-
       return false;
     }
 
-    if(!cacheFile){
+    if (!cacheFile) {
       this.cache[cacheKey] = result;
     } else {
       const ws = fs.createWriteStream(cacheFile);
       result.pipe(ws);
     }
-
     return result;
   }
 
-  async getService(servicename){
-    const response = await axios.get(`${this.serviceRegisterUrl}/find/${servicename}/${this.serviceVersionIdentifier}`);
+  async getService(servicename) {
+    const response = await axios.get(`${this.serviceRegistryUrl}/find/${servicename}/${this.serviceVersionIdentifier}`);
     return response.data;
   }
 }

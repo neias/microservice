@@ -9,18 +9,16 @@ module.exports = (param) => {
   const { speakers } = param;
 
   router.get('/images/:type/:file', async (req, res, next) => {
-    try{
+    try {
       const image = await speakers.getImage(`${req.params.type}/${req.params.file}`);
       return image.pipe(res);
-    } catch (err){
+    } catch (err) {
       return next(err);
     }
-
   });
 
   router.get('/', async (req, res, next) => {
     try {
-
       const promises = [];
       promises.push(speakers.getListShort());
       promises.push(speakers.getAllArtwork());

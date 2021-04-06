@@ -37,6 +37,7 @@ module.exports = (config) => {
 
   service.get('/find/:servicename/:serviceversion', (req, res, next) => {
     const { servicename, serviceversion } = req.params;
+    console.log(servicename, serviceversion);
     const svc = serviceRegistry.get(servicename, serviceversion);
     if(!svc) return res.status(404).json({ result: 'Service not found' });
     return res.json(svc);
